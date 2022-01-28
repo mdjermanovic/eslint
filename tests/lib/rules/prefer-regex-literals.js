@@ -121,7 +121,10 @@ ruleTester.run("prefer-regex-literals", rule, {
             code: "RegExp('a');",
             globals: { RegExp: "off" }
         },
-        "new globalThis.RegExp('a');",
+        {
+            code: "new globalThis.RegExp('a');",
+            parserOptions: { ecmaVersion: 2019 } // ecmaVersion that doesn't automatically add `globalThis` global.
+        },
         {
             code: "new globalThis.RegExp('a');",
             env: { es6: true }

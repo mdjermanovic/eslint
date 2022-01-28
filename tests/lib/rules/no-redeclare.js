@@ -230,8 +230,7 @@ ruleTester.run("no-redeclare", rule, {
         {
             code: "var a; var {a = 0, b: globalThis = 0} = {};",
             options: [{ builtinGlobals: true }],
-            parserOptions: { ecmaVersion: 6 },
-            env: { es2020: true },
+            parserOptions: { ecmaVersion: 2020 },
             errors: [
                 { message: "'a' is already defined.", type: "Identifier" },
                 { message: "'globalThis' is already defined as a built-in global variable.", type: "Identifier" }

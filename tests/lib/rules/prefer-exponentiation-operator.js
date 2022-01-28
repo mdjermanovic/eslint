@@ -69,7 +69,10 @@ ruleTester.run("prefer-exponentiation-operator", rule, {
         "function foo(Math) { Math.pow(a, b); }",
         "function foo() { Math.pow(a, b); var Math; }",
 
-        "globalThis.Math.pow(a, b)",
+        {
+            code: "globalThis.Math.pow(a, b)",
+            parserOptions: { ecmaVersion: 2019 } // ecmaVersion that doesn't automatically add `globalThis` global.
+        },
         { code: "globalThis.Math.pow(a, b)", env: { es6: true } },
         { code: "globalThis.Math.pow(a, b)", env: { es2017: true } },
         {

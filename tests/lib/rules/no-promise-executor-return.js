@@ -92,10 +92,12 @@ ruleTester.run("no-promise-executor-return", rule, {
             code: "new Promise((resolve, reject) => { return 1; });",
             globals: { Promise: "off" }
         },
-        {
-            code: "new Promise((resolve, reject) => 1);",
-            env: { es6: false }
-        },
+
+        // this test doesn't make sense with flat config
+        // {
+        //     code: "new Promise((resolve, reject) => 1);",
+        //     env: { es6: false }
+        // },
 
         // global Promise is shadowed
         "let Promise; new Promise(function (resolve, reject) { return 1; });",

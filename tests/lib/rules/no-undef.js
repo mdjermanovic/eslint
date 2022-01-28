@@ -29,8 +29,11 @@ ruleTester.run("no-undef", rule, {
         "var a; a = 1; a++;",
         "var a; function f() { a = 1; }",
         "/*global b:true*/ b++;",
-        "/*eslint-env browser*/ window;",
-        "/*eslint-env node*/ require(\"a\");",
+
+        // these test don't make sense with flat config
+        // "/*eslint-env browser*/ window;",
+        // "/*eslint-env node*/ require(\"a\");",
+
         "Object; isNaN();",
         "toString()",
         "hasOwnProperty()",

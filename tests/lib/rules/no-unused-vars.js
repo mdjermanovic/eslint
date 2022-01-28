@@ -16,22 +16,28 @@ const rule = require("../../../lib/rules/no-unused-vars"),
 // Tests
 //------------------------------------------------------------------------------
 
-const ruleTester = new RuleTester();
+const ruleTester = new RuleTester({
+    plugins: {
+        "my-plugin": {
+            rules: {
+                "use-every-a": context => {
 
-ruleTester.defineRule("use-every-a", context => {
-
-    /**
-     * Mark a variable as used
-     * @returns {void}
-     * @private
-     */
-    function useA() {
-        context.markVariableAsUsed("a");
+                    /**
+                     * Mark a variable as used
+                     * @returns {void}
+                     * @private
+                     */
+                    function useA() {
+                        context.markVariableAsUsed("a");
+                    }
+                    return {
+                        VariableDeclaration: useA,
+                        ReturnStatement: useA
+                    };
+                }
+            }
+        }
     }
-    return {
-        VariableDeclaration: useA,
-        ReturnStatement: useA
-    };
 });
 
 /**
@@ -152,9 +158,9 @@ ruleTester.run("no-unused-vars", rule, {
         { code: "/*exported x, y*/  var { x, y } = z", parserOptions: { ecmaVersion: 6 } },
 
         // Can mark variables as used via context.markVariableAsUsed()
-        "/*eslint use-every-a:1*/ var a;",
-        "/*eslint use-every-a:1*/ !function(a) { return 1; }",
-        "/*eslint use-every-a:1*/ !function() { var a; return 1 }",
+        "/*eslint my-plugin/use-every-a:1*/ var a;",
+        "/*eslint my-plugin/use-every-a:1*/ !function(a) { return 1; }",
+        "/*eslint my-plugin/use-every-a:1*/ !function() { var a; return 1 }",
 
         // ignore pattern
         { code: "var _a;", options: [{ vars: "all", varsIgnorePattern: "^_" }] },
@@ -304,7 +310,7 @@ ruleTester.run("no-unused-vars", rule, {
         },
 
         // https://github.com/eslint/eslint/issues/10952
-        "/*eslint use-every-a:1*/ !function(b, a) { return 1 }",
+        "/*eslint my-plugin/use-every-a:1*/ !function(b, a) { return 1 }",
 
         // https://github.com/eslint/eslint/issues/10982
         "var a = function () { a(); }; a();",
