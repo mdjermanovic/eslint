@@ -226,7 +226,10 @@ ruleTester.run("no-setter-return", rule, {
         "object.create(foo, { bar: { set: function(val) { return 1; } } })",
 
         // global object doesn't exist
-        "Reflect.defineProperty(foo, 'bar', { set(val) { if (val) { return 1; } } })",
+        {
+            code: "Reflect.defineProperty(foo, 'bar', { set: function(val) { if (val) { return 1; } } })",
+            parserOptions: { ecmaVersion: 5 } // ecmaVersion that doesn't automatically add `Reflect` global.
+        },
         "/* globals Object:off */ Object.defineProperty(foo, 'bar', { set(val) { return 1; } })",
         {
             code: "Object.defineProperties(foo, { bar: { set(val) { try { return 1; } catch(e){} } } })",
