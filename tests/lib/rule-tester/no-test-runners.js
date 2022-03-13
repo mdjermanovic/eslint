@@ -5,9 +5,6 @@
  */
 "use strict";
 
-// TODO: update these tests once it is decided what to do with the default `it` in RuleTester
-return; /* eslint no-unreachable: "off" -- temporary*/
-
 const assert = require("assert");
 const { RuleTester } = require("../../../lib/rule-tester");
 const tmpIt = it;
@@ -28,7 +25,7 @@ try {
                 { code: "var foo = bar;", output: "invalid output", errors: 1 }
             ]
         });
-    }, new assert.AssertionError({ actual: " foo = bar;", expected: "invalid output", operator: "===" }).message);
+    }, /Cannot find 'it' function/u);
 } finally {
     it = tmpIt;
     describe = tmpDescribe;

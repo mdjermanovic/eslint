@@ -556,8 +556,7 @@ target.mocha = () => {
         errors++;
     }
 
-    // TODO: revert coverage tresholds once all tests work
-    lastReturn = exec(`${getBinFile("nyc")} check-coverage --statement 95 --branch 95 --function 95 --lines 95`);
+    lastReturn = exec(`${getBinFile("nyc")} check-coverage --statement 98 --branch 97 --function 98 --lines 98`);
     if (lastReturn.code !== 0) {
         errors++;
     }
