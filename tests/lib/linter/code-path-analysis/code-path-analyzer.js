@@ -64,14 +64,14 @@ describe("CodePathAnalyzer", () => {
     describe("interface of code paths", () => {
         let actual = [];
 
-        beforeEach(() => {
+        beforeEach(async () => {
             actual = [];
             linter.defineRule("test", () => ({
                 onCodePathStart(codePath) {
                     actual.push(codePath);
                 }
             }));
-            linter.verify(
+            await linter.verify(
                 "function foo(a) { if (a) return 0; else throw new Error(); }",
                 { rules: { test: 2 } }
             );
@@ -135,7 +135,7 @@ describe("CodePathAnalyzer", () => {
             assert(actual[1].thrownSegments[0] instanceof CodePathSegment);
         });
 
-        it("should have `currentSegments` as CodePathSegment[]", () => {
+        it("should have `currentSegments` as CodePathSegment[]", async () => {
             assert(Array.isArray(actual[0].currentSegments));
             assert(Array.isArray(actual[1].currentSegments));
             assert(actual[0].currentSegments.length === 0);
@@ -159,7 +159,7 @@ describe("CodePathAnalyzer", () => {
                     }
                 };
             });
-            linter.verify(
+            await linter.verify(
                 "function foo(a) { if (a) return 0; else throw new Error(); }",
                 { rules: { test: 2 } }
             );
@@ -169,14 +169,14 @@ describe("CodePathAnalyzer", () => {
     describe("interface of code path segments", () => {
         let actual = [];
 
-        beforeEach(() => {
+        beforeEach(async () => {
             actual = [];
             linter.defineRule("test", () => ({
                 onCodePathSegmentStart(segment) {
                     actual.push(segment);
                 }
             }));
-            linter.verify(
+            await linter.verify(
                 "function foo(a) { if (a) return 0; else throw new Error(); }",
                 { rules: { test: 2 } }
             );
@@ -254,7 +254,7 @@ describe("CodePathAnalyzer", () => {
     });
 
     describe("onCodePathStart", () => {
-        it("should be fired at the head of programs/functions", () => {
+        it("should be fired at the head of programs/functions", async () => {
             let count = 0;
             let lastCodePathNodeType = null;
 
@@ -287,7 +287,7 @@ describe("CodePathAnalyzer", () => {
                     assert(lastCodePathNodeType === "ArrowFunctionExpression");
                 }
             }));
-            linter.verify(
+            await linter.verify(
                 "foo(); function foo() {} var foo = function() {}; var foo = () => {};",
                 { rules: { test: 2 }, env: { es6: true } }
             );
@@ -297,7 +297,7 @@ describe("CodePathAnalyzer", () => {
     });
 
     describe("onCodePathEnd", () => {
-        it("should be fired at the end of programs/functions", () => {
+        it("should be fired at the end of programs/functions", async () => {
             let count = 0;
             let lastNodeType = null;
 
@@ -330,7 +330,7 @@ describe("CodePathAnalyzer", () => {
                     lastNodeType = "ArrowFunctionExpression";
                 }
             }));
-            linter.verify(
+            await linter.verify(
                 "foo(); function foo() {} var foo = function() {}; var foo = () => {};",
                 { rules: { test: 2 }, env: { es6: true } }
             );
@@ -340,7 +340,7 @@ describe("CodePathAnalyzer", () => {
     });
 
     describe("onCodePathSegmentStart", () => {
-        it("should be fired at the head of programs/functions for the initial segment", () => {
+        it("should be fired at the head of programs/functions for the initial segment", async () => {
             let count = 0;
             let lastCodePathNodeType = null;
 
@@ -373,7 +373,7 @@ describe("CodePathAnalyzer", () => {
                     assert(lastCodePathNodeType === "ArrowFunctionExpression");
                 }
             }));
-            linter.verify(
+            await linter.verify(
                 "foo(); function foo() {} var foo = function() {}; var foo = () => {};",
                 { rules: { test: 2 }, env: { es6: true } }
             );
@@ -383,7 +383,7 @@ describe("CodePathAnalyzer", () => {
     });
 
     describe("onCodePathSegmentEnd", () => {
-        it("should be fired at the end of programs/functions for the final segment", () => {
+        it("should be fired at the end of programs/functions for the final segment", async () => {
             let count = 0;
             let lastNodeType = null;
 
@@ -416,7 +416,7 @@ describe("CodePathAnalyzer", () => {
                     lastNodeType = "ArrowFunctionExpression";
                 }
             }));
-            linter.verify(
+            await linter.verify(
                 "foo(); function foo() {} var foo = function() {}; var foo = () => {};",
                 { rules: { test: 2 }, env: { es6: true } }
             );
@@ -426,7 +426,7 @@ describe("CodePathAnalyzer", () => {
     });
 
     describe("onCodePathSegmentLoop", () => {
-        it("should be fired in `while` loops", () => {
+        it("should be fired in `while` loops", async () => {
             let count = 0;
 
             linter.defineRule("test", () => ({
@@ -437,7 +437,7 @@ describe("CodePathAnalyzer", () => {
                     assert(node.type === "WhileStatement");
                 }
             }));
-            linter.verify(
+            await linter.verify(
                 "while (a) { foo(); }",
                 { rules: { test: 2 } }
             );
@@ -445,7 +445,7 @@ describe("CodePathAnalyzer", () => {
             assert(count === 1);
         });
 
-        it("should be fired in `do-while` loops", () => {
+        it("should be fired in `do-while` loops", async () => {
             let count = 0;
 
             linter.defineRule("test", () => ({
@@ -456,7 +456,7 @@ describe("CodePathAnalyzer", () => {
                     assert(node.type === "DoWhileStatement");
                 }
             }));
-            linter.verify(
+            await linter.verify(
                 "do { foo(); } while (a);",
                 { rules: { test: 2 } }
             );
@@ -464,7 +464,7 @@ describe("CodePathAnalyzer", () => {
             assert(count === 1);
         });
 
-        it("should be fired in `for` loops", () => {
+        it("should be fired in `for` loops", async () => {
             let count = 0;
 
             linter.defineRule("test", () => ({
@@ -482,7 +482,7 @@ describe("CodePathAnalyzer", () => {
                     }
                 }
             }));
-            linter.verify(
+            await linter.verify(
                 "for (var i = 0; i < 10; ++i) { foo(); }",
                 { rules: { test: 2 } }
             );
@@ -490,7 +490,7 @@ describe("CodePathAnalyzer", () => {
             assert(count === 2);
         });
 
-        it("should be fired in `for-in` loops", () => {
+        it("should be fired in `for-in` loops", async () => {
             let count = 0;
 
             linter.defineRule("test", () => ({
@@ -508,7 +508,7 @@ describe("CodePathAnalyzer", () => {
                     }
                 }
             }));
-            linter.verify(
+            await linter.verify(
                 "for (var k in obj) { foo(); }",
                 { rules: { test: 2 } }
             );
@@ -516,7 +516,7 @@ describe("CodePathAnalyzer", () => {
             assert(count === 2);
         });
 
-        it("should be fired in `for-of` loops", () => {
+        it("should be fired in `for-of` loops", async () => {
             let count = 0;
 
             linter.defineRule("test", () => ({
@@ -534,7 +534,7 @@ describe("CodePathAnalyzer", () => {
                     }
                 }
             }));
-            linter.verify(
+            await linter.verify(
                 "for (var x of xs) { foo(); }",
                 { rules: { test: 2 }, env: { es6: true } }
             );
@@ -548,7 +548,7 @@ describe("CodePathAnalyzer", () => {
         const testDataFiles = fs.readdirSync(testDataDir);
 
         testDataFiles.forEach(file => {
-            it(file, () => {
+            it(file, async () => {
                 const source = fs.readFileSync(path.join(testDataDir, file), { encoding: "utf8" });
                 const expected = getExpectedDotArrows(source);
                 const actual = [];
@@ -560,7 +560,7 @@ describe("CodePathAnalyzer", () => {
                         actual.push(debug.makeDotArrows(codePath));
                     }
                 }));
-                const messages = linter.verify(source, {
+                const messages = await linter.verify(source, {
                     parserOptions: { ecmaVersion: 2022 },
                     rules: { test: 2 }
                 });

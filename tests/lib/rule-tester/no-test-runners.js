@@ -25,7 +25,7 @@ try {
                 { code: "var foo = bar;", output: "invalid output", errors: 1 }
             ]
         });
-    }, new assert.AssertionError({ actual: " foo = bar;", expected: "invalid output", operator: "===" }).message);
+    }, /Cannot find 'it' function/u);
 } finally {
     it = tmpIt;
     describe = tmpDescribe;

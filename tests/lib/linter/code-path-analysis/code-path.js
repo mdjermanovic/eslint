@@ -22,7 +22,7 @@ const linter = new Linter();
  * @param {string} code A source code.
  * @returns {CodePath[]} A list of created code paths.
  */
-function parseCodePaths(code) {
+async function parseCodePaths(code) {
     const retv = [];
 
     linter.defineRule("test", () => ({
@@ -31,7 +31,7 @@ function parseCodePaths(code) {
         }
     }));
 
-    linter.verify(code, {
+    await linter.verify(code, {
         rules: { test: 2 },
         parserOptions: { ecmaVersion: "latest" }
     });
@@ -83,32 +83,32 @@ describe("CodePathAnalyzer", () => {
 
     describe("CodePath#origin", () => {
 
-        it("should be 'program' when code path starts at root node", () => {
-            const codePath = parseCodePaths("foo(); bar(); baz();")[0];
+        it("should be 'program' when code path starts at root node", async () => {
+            const codePath = (await parseCodePaths("foo(); bar(); baz();"))[0];
 
             assert.strictEqual(codePath.origin, "program");
         });
 
-        it("should be 'function' when code path starts inside a function", () => {
-            const codePath = parseCodePaths("function foo() {}")[1];
+        it("should be 'function' when code path starts inside a function", async () => {
+            const codePath = (await parseCodePaths("function foo() {}"))[1];
 
             assert.strictEqual(codePath.origin, "function");
         });
 
-        it("should be 'function' when code path starts inside an arrow function", () => {
-            const codePath = parseCodePaths("let foo = () => {}")[1];
+        it("should be 'function' when code path starts inside an arrow function", async () => {
+            const codePath = (await parseCodePaths("let foo = () => {}"))[1];
 
             assert.strictEqual(codePath.origin, "function");
         });
 
-        it("should be 'class-field-initializer' when code path starts inside a class field initializer", () => {
-            const codePath = parseCodePaths("class Foo { a=1; }")[1];
+        it("should be 'class-field-initializer' when code path starts inside a class field initializer", async () => {
+            const codePath = (await parseCodePaths("class Foo { a=1; }"))[1];
 
             assert.strictEqual(codePath.origin, "class-field-initializer");
         });
 
-        it("should be 'class-static-block' when code path starts inside a class static block", () => {
-            const codePath = parseCodePaths("class Foo { static { this.a=1; } }")[1];
+        it("should be 'class-static-block' when code path starts inside a class static block", async () => {
+            const codePath = (await parseCodePaths("class Foo { static { this.a=1; } }"))[1];
 
             assert.strictEqual(codePath.origin, "class-static-block");
         });
@@ -118,8 +118,8 @@ describe("CodePathAnalyzer", () => {
 
         describe("should traverse segments from the first to the end:", () => {
             /* eslint-disable internal-rules/multiline-comment-style -- Commenting out */
-            it("simple", () => {
-                const codePath = parseCodePaths("foo(); bar(); baz();")[0];
+            it("simple", async () => {
+                const codePath = (await parseCodePaths("foo(); bar(); baz();"))[0];
                 const order = getOrderOfTraversing(codePath);
 
                 assert.deepStrictEqual(order, ["s1_1"]);
@@ -135,8 +135,8 @@ describe("CodePathAnalyzer", () => {
                 */
             });
 
-            it("if", () => {
-                const codePath = parseCodePaths("if (a) foo(); else bar(); baz();")[0];
+            it("if", async () => {
+                const codePath = (await parseCodePaths("if (a) foo(); else bar(); baz();"))[0];
                 const order = getOrderOfTraversing(codePath);
 
                 assert.deepStrictEqual(order, ["s1_1", "s1_2", "s1_3", "s1_4"]);
@@ -156,8 +156,8 @@ describe("CodePathAnalyzer", () => {
                 */
             });
 
-            it("switch", () => {
-                const codePath = parseCodePaths("switch (a) { case 0: foo(); break; case 1: bar(); } baz();")[0];
+            it("switch", async () => {
+                const codePath = (await parseCodePaths("switch (a) { case 0: foo(); break; case 1: bar(); } baz();"))[0];
                 const order = getOrderOfTraversing(codePath);
 
                 assert.deepStrictEqual(order, ["s1_1", "s1_2", "s1_4", "s1_5", "s1_6"]);
@@ -181,8 +181,8 @@ describe("CodePathAnalyzer", () => {
                 */
             });
 
-            it("while", () => {
-                const codePath = parseCodePaths("while (a) foo(); bar();")[0];
+            it("while", async () => {
+                const codePath = (await parseCodePaths("while (a) foo(); bar();"))[0];
                 const order = getOrderOfTraversing(codePath);
 
                 assert.deepStrictEqual(order, ["s1_1", "s1_2", "s1_3", "s1_4"]);
@@ -201,8 +201,8 @@ describe("CodePathAnalyzer", () => {
                 */
             });
 
-            it("for", () => {
-                const codePath = parseCodePaths("for (var i = 0; i < 10; ++i) foo(i); bar();")[0];
+            it("for", async () => {
+                const codePath = (await parseCodePaths("for (var i = 0; i < 10; ++i) foo(i); bar();"))[0];
                 const order = getOrderOfTraversing(codePath);
 
                 assert.deepStrictEqual(order, ["s1_1", "s1_2", "s1_3", "s1_4", "s1_5"]);
@@ -222,8 +222,8 @@ describe("CodePathAnalyzer", () => {
                 */
             });
 
-            it("for-in", () => {
-                const codePath = parseCodePaths("for (var key in obj) foo(key); bar();")[0];
+            it("for-in", async () => {
+                const codePath = (await parseCodePaths("for (var key in obj) foo(key); bar();"))[0];
                 const order = getOrderOfTraversing(codePath);
 
                 assert.deepStrictEqual(order, ["s1_1", "s1_3", "s1_2", "s1_4", "s1_5"]);
@@ -245,8 +245,8 @@ describe("CodePathAnalyzer", () => {
                 */
             });
 
-            it("try-catch", () => {
-                const codePath = parseCodePaths("try { foo(); } catch (e) { bar(); } baz();")[0];
+            it("try-catch", async () => {
+                const codePath = (await parseCodePaths("try { foo(); } catch (e) { bar(); } baz();"))[0];
                 const order = getOrderOfTraversing(codePath);
 
                 assert.deepStrictEqual(order, ["s1_1", "s1_2", "s1_3", "s1_4"]);
@@ -268,8 +268,8 @@ describe("CodePathAnalyzer", () => {
             });
         });
 
-        it("should traverse segments from `options.first` to `options.last`.", () => {
-            const codePath = parseCodePaths("if (a) { if (b) { foo(); } bar(); } else { out1(); } out2();")[0];
+        it("should traverse segments from `options.first` to `options.last`.", async () => {
+            const codePath = (await parseCodePaths("if (a) { if (b) { foo(); } bar(); } else { out1(); } out2();"))[0];
             const order = getOrderOfTraversing(codePath, {
                 first: codePath.initialSegment.nextSegments[0],
                 last: codePath.initialSegment.nextSegments[0].nextSegments[1]
@@ -296,8 +296,8 @@ describe("CodePathAnalyzer", () => {
             */
         });
 
-        it("should stop immediately when 'controller.break()' was called.", () => {
-            const codePath = parseCodePaths("if (a) { if (b) { foo(); } bar(); } else { out1(); } out2();")[0];
+        it("should stop immediately when 'controller.break()' was called.", async () => {
+            const codePath = (await parseCodePaths("if (a) { if (b) { foo(); } bar(); } else { out1(); } out2();"))[0];
             const order = getOrderOfTraversing(codePath, null, (segment, controller) => {
                 if (segment.id === "s1_2") {
                     controller.break();
@@ -325,8 +325,8 @@ describe("CodePathAnalyzer", () => {
             */
         });
 
-        it("should skip the current branch when 'controller.skip()' was called.", () => {
-            const codePath = parseCodePaths("if (a) { if (b) { foo(); } bar(); } else { out1(); } out2();")[0];
+        it("should skip the current branch when 'controller.skip()' was called.", async () => {
+            const codePath = (await parseCodePaths("if (a) { if (b) { foo(); } bar(); } else { out1(); } out2();"))[0];
             const order = getOrderOfTraversing(codePath, null, (segment, controller) => {
                 if (segment.id === "s1_2") {
                     controller.skip();
